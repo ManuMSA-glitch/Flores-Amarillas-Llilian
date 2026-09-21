@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Flores Amarillas para Ti 🌻</title>
+    
+    <!-- Google Fonts Elegantes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -15,7 +21,7 @@
         body {
             background-color: #030308;
             overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             color: #ffffff;
             user-select: none;
         }
@@ -31,29 +37,56 @@
             cursor: pointer;
         }
 
-        /* Mensaje flotante de indicación */
+        /* Indicación superior flotante */
         .hint-text {
             position: absolute;
             top: 25px;
             width: 100%;
             text-align: center;
             color: #ffea79;
-            font-size: 0.85rem;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.4rem;
             letter-spacing: 1px;
             z-index: 10;
             pointer-events: none;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.9);
             animation: pulse 2s infinite ease-in-out;
         }
 
-        /* Carta emergente personalizada */
+        /* Botón de Música Flotante */
+        .music-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 20;
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            backdrop-filter: blur(8px);
+            color: #ffd700;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .music-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Carta emergente con estilo manuscrito */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.82);
             backdrop-filter: blur(10px);
             display: flex;
             justify-content: center;
@@ -61,7 +94,7 @@
             z-index: 100;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.35s ease;
         }
 
         .modal-overlay.active {
@@ -74,7 +107,7 @@
             color: #2c1d11;
             width: 85%;
             max-width: 360px;
-            padding: 30px 22px;
+            padding: 32px 25px;
             border-radius: 24px;
             text-align: center;
             box-shadow: 0 15px 35px rgba(255, 215, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.8);
@@ -89,25 +122,26 @@
         }
 
         .card .icon-header {
-            font-size: 3rem;
-            margin-bottom: 10px;
+            font-size: 3.2rem;
+            margin-bottom: 8px;
             display: block;
         }
 
         .card h2 {
-            font-family: 'Georgia', serif;
-            font-size: 1.8rem;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.3rem;
             color: #4a2c00;
             margin-bottom: 12px;
-            font-style: italic;
+            font-weight: 700;
         }
 
         .card p {
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.92rem;
+            line-height: 1.6;
             color: #3d2400;
             margin-bottom: 22px;
-            font-weight: 500;
+            font-weight: 400;
         }
 
         .card button {
@@ -116,24 +150,35 @@
             border: none;
             padding: 12px 28px;
             border-radius: 15px;
-            font-weight: bold;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: background 0.2s;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.03); }
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.04); }
         }
     </style>
 </head>
 <body>
 
-    <div class="hint-text">✨ Toca cualquier palabra o flor ✨</div>
+    <div class="hint-text">✨ Toca la pantalla o cualquier frase ✨</div>
+
+    <!-- Botón para Controlar la Música -->
+    <button class="music-btn" id="musicBtn" onclick="toggleMusic()">
+        <span id="musicIcon">🎵</span> <span id="musicText">Música</span>
+    </button>
+
+    <!-- Audio Romántico de Fondo (puedes cambiar la URL por tu MP3 favorito) -->
+    <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3"></audio>
+
     <canvas id="galaxyCanvas"></canvas>
 
-    <!-- Modal emergente para las cartas -->
+    <!-- Carta Emergente -->
     <div class="modal-overlay" id="modal">
         <div class="card">
             <span class="icon-header" id="cardIcon">🌻</span>
@@ -146,6 +191,7 @@
     <script>
         const canvas = document.getElementById('galaxyCanvas');
         const ctx = canvas.getContext('2d');
+        const audio = document.getElementById('bgMusic');
 
         let width, height, dpr;
 
@@ -159,7 +205,22 @@
             initHeart();
         }
 
-        // 1. Mensajes Personalizados por cada Palabra / Flor
+        // Control de Música
+        let isPlaying = false;
+        function toggleMusic() {
+            if (isPlaying) {
+                audio.pause();
+                document.getElementById('musicIcon').innerText = '🔇';
+                document.getElementById('musicText').innerText = 'Música';
+            } else {
+                audio.play();
+                document.getElementById('musicIcon').innerText = '🎶';
+                document.getElementById('musicText').innerText = 'Sonando';
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // 1. Mensajes Personalizados por cada Palabra
         const itemsData = [
             { 
                 text: "Te Amo 💛", 
@@ -168,9 +229,9 @@
                 msg: "Te amo más de lo que las palabras pueden expresar. Gracias por hacer cada uno de mis días infinitamente más bonitos." 
             },
             { 
-                text: "Mi Amor", 
+                text: "Mi Amor 🌻", 
                 icon: "🌻", 
-                title: "Feliz Día de las Flores Amarillas", 
+                title: "Flores Amarillas", 
                 msg: "Hoy quería regalarte un detalle eterno que nunca se marchite, porque tu luz en mi vida dura para siempre." 
             },
             { 
@@ -180,7 +241,7 @@
                 msg: "Tu sonrisa brilla más fuerte que mil girasoles juntos. Nunca dejes de iluminar todo a tu alrededor." 
             },
             { 
-                text: "Eres preciosa 🌻", 
+                text: "Eres preciosa 💐", 
                 icon: "💐", 
                 title: "Tan hermosa", 
                 msg: "No existe flor en ningún jardín del mundo que se compare con la belleza de tu corazón." 
@@ -195,7 +256,7 @@
                 text: "Me encantas ✨", 
                 icon: "💐", 
                 title: "Cada detalle tuyo", 
-                msg: "Me encanta tu risa, tu voz, tu ternura y la forma en que haces que todo sea mejor." 
+                msg: "Me encanta tu risa, tu voz, tu ternura y la forma en que haces que todo sea mejor a tu lado." 
             },
             { 
                 text: "Siempre juntos 🌻", 
@@ -213,7 +274,7 @@
 
         // Partículas Espirales de Fondo
         const spiralParticles = [];
-        for (let i = 0; i < 400; i++) {
+        for (let i = 0; i < 380; i++) {
             spiralParticles.push({
                 radius: Math.random() * 0.42,
                 angle: Math.random() * Math.PI * 2,
@@ -228,7 +289,7 @@
         const heartParticles = [];
         function initHeart() {
             heartParticles.length = 0;
-            const total = 180;
+            const total = 170;
             const minDim = Math.min(width, height);
             const scale = minDim / 48;
             const centerY = height / 2 - (minDim * 0.2);
@@ -247,16 +308,62 @@
             }
         }
 
+        // Partículas interactivas (Pétalos al tocar y explosión)
+        const activePetals = [];
+
+        function spawnPetal(x, y, isExplosion = false) {
+            const count = isExplosion ? 35 : 5;
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = isExplosion ? (Math.random() * 4 + 2) : (Math.random() * 1.5 + 0.5);
+                activePetals.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: isExplosion ? Math.sin(angle) * speed : -Math.random() * 2 - 1,
+                    size: Math.random() * 6 + 4,
+                    rotation: Math.random() * Math.PI * 2,
+                    vRot: (Math.random() - 0.5) * 0.1,
+                    alpha: 1,
+                    color: Math.random() > 0.3 ? '#ffd700' : '#ffee77'
+                });
+            }
+        }
+
         // Nodos Orbitando (Textos interactivos)
         const orbitingNodes = itemsData.map((item, index) => {
             return {
                 ...item,
                 angle: (index / itemsData.length) * Math.PI * 2,
                 currentX: 0,
-                currentY: 0,
-                currentSize: 14
+                currentY: 0
             };
         });
+
+        // Dibujar un Girasol vectorizado en Canvas
+        function drawCanvasSunflower(x, y, size, rotation) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+
+            // Pétalos
+            const numPetals = 12;
+            ctx.fillStyle = '#ffd700';
+            for (let i = 0; i < numPetals; i++) {
+                ctx.beginPath();
+                ctx.rotate((Math.PI * 2) / numPetals);
+                ctx.ellipse(size * 0.55, 0, size * 0.45, size * 0.16, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Centro del girasol
+            ctx.fillStyle = '#4a2c00';
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.32, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
 
         // Animación Principal
         function animate() {
@@ -283,6 +390,10 @@
                 ctx.fill();
             });
 
+            // Girasoles decorativos en las esquinas inferiores
+            drawCanvasSunflower(minDim * 0.15, height - minDim * 0.12, 18, Date.now() * 0.0005);
+            drawCanvasSunflower(width - minDim * 0.15, height - minDim * 0.12, 18, -Date.now() * 0.0005);
+
             // Corazón brillante
             ctx.shadowBlur = 12;
             ctx.shadowColor = '#ffd700';
@@ -302,30 +413,53 @@
                 const x = centerX + Math.cos(node.angle) * orbitRadiusX;
                 const y = centerY + Math.sin(node.angle) * orbitRadiusY;
 
-                // Profundidad 3D simulada
                 const scale = (Math.sin(node.angle) + 1.8) / 2.8;
-                const fontSize = Math.floor(13 * scale);
+                const fontSize = Math.floor(16 * scale);
 
                 node.currentX = x;
                 node.currentY = y;
-                node.currentSize = fontSize;
 
                 ctx.globalAlpha = Math.max(0.4, scale);
-                ctx.font = `bold ${fontSize}px -apple-system, sans-serif`;
+                ctx.font = `bold ${fontSize}px 'Dancing Script', cursive`;
                 ctx.fillStyle = '#ffea79';
                 ctx.textAlign = 'center';
 
-                // Efecto de brillo de texto
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'rgba(255, 215, 0, 0.7)';
                 ctx.fillText(`${node.icon} ${node.text}`, x, y);
                 ctx.shadowBlur = 0;
             });
 
+            // Animación de Pétalos Activos (Toques y Explosiones)
+            for (let i = activePetals.length - 1; i >= 0; i--) {
+                const p = activePetals[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.rotation += p.vRot;
+                p.alpha -= 0.015;
+
+                if (p.alpha <= 0) {
+                    activePetals.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation);
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                
+                // Dibujar forma de pétalo
+                ctx.beginPath();
+                ctx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
             requestAnimationFrame(animate);
         }
 
-        // Detección de clics/toques en los nodos
+        // Detección de clics/toques
         function handleInteraction(e) {
             const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -334,11 +468,23 @@
             const touchX = clientX - rect.left;
             const touchY = clientY - rect.top;
 
+            // Intentar reproducir música en el primer toque si no estaba sonando
+            if (!isPlaying && audio.paused) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    document.getElementById('musicIcon').innerText = '🎶';
+                    document.getElementById('musicText').innerText = 'Sonando';
+                }).catch(() => {});
+            }
+
+            // Generar pétalos flotantes en el punto tocado
+            spawnPetal(touchX, touchY, false);
+
             orbitingNodes.forEach(node => {
                 const dist = Math.hypot(touchX - node.currentX, touchY - node.currentY);
-                // Zona de detección cómoda para dedos
-                if (dist < 35) {
+                if (dist < 38) {
                     openCard(node);
+                    spawnPetal(touchX, touchY, true); // Explosión de pétalos al abrir
                 }
             });
         }
