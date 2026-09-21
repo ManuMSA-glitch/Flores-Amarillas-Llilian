@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flores Amarillas para Ti 🌻</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #030308;
+            overflow: hidden;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #ffffff;
+            user-select: none;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Botón para abrir la carta */
+        .btn-carta {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #ffd700, #ff9800);
+            color: #000;
+            font-weight: bold;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .btn-carta:hover {
+            transform: translateX(-50%) scale(1.08);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.9);
+        }
+
+        /* Carta emergente */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #fff2a1, #fbc02d);
+            color: #333;
+            width: 88%;
+            max-width: 380px;
+            padding: 30px 25px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.6);
+            transform: translateY(20px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid #fff;
+        }
+
+        .modal-overlay.active .card {
+            transform: translateY(0) scale(1);
+        }
+
+        .card h2 {
+            font-family: 'Georgia', serif;
+            font-size: 2rem;
+            color: #5d4037;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #4e342e;
+            margin-bottom: 20px;
+        }
+
+        .card .signature {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #3e2723;
+            margin-bottom: 20px;
+        }
+
+        .card button {
+            background: #3e2723;
+            color: #ffd700;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="galaxyCanvas"></canvas>
+    
+    <button class="btn-carta" onclick="toggleModal(true)">Abrir Carta ✉️</button>
+
+    <div class="modal-overlay" id="modal">
+        <div class="card">
+            <h2>Mi amor</h2>
+            <p>Estas flores amarillas son como tú: brillantes, radiantes y llenas de alegría.<br><br>Gracias por iluminar cada uno de mis días. Eres simplemente hermosa.</p>
+            <div class="signature">Te Amo Mucho 💛</div>
+            <button onclick="toggleModal(false)">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('galaxyCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initHeart();
+        });
+
+        // Partículas de la Galaxia en Espiral
+        const spiralParticles = [];
+        const numSpiral = 450;
+
+        for (let i = 0; i < numSpiral; i++) {
+            spiralParticles.push({
+                radius: Math.random() * Math.min(width, height) * 0.4,
+                angle: Math.random() * Math.PI * 2,
+                speed: 0.002 + Math.random() * 0.003,
+                size: Math.random() * 2 + 0.5,
+                color: Math.random() > 0.3 ? '#ffd700' : '#ffffff',
+                alpha: Math.random() * 0.8 + 0.2
+            });
+        }
+
+        // Corazón de Partículas Brillantes
+        const heartParticles = [];
+        function initHeart() {
+            heartParticles.length = 0;
+            const total = 180;
+            const scale = Math.min(width, height) / 50;
+            const centerY = height / 2 - 110;
+
+            for (let i = 0; i < total; i++) {
+                const t = (i / total) * Math.PI * 2;
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+                heartParticles.push({
+                    x: width / 2 + x * scale,
+                    y: centerY + y * scale,
+                    size: Math.random() * 2.5 + 1,
+                    alpha: Math.random() * 0.7 + 0.3
+                });
+            }
+        }
+        initHeart();
+
+        // Frases y Flores Orbitando
+        const items = [
+            { text: "Te Amo 💛", icon: "💐" },
+            { text: "Mi Amor", icon: "🌻" },
+            { text: "Eres mi sol ☀️", icon: "🌼" },
+            { text: "Eres preciosa 🌻", icon: "💐" },
+            { text: "Amor de mi vida 💛", icon: "🌻" },
+            { text: "Me encantas", icon: "✨" },
+            { text: "Siempre juntos 🌻", icon: "💐" },
+            { text: "Eres única", icon: "🌻" }
+        ];
+
+        const orbitingNodes = items.map((item, index) => {
+            return {
+                text: item.text,
+                icon: item.icon,
+                angle: (index / items.length) * Math.PI * 2,
+                orbitRadiusX: Math.min(width, height) * 0.38,
+                orbitRadiusY: Math.min(width, height) * 0.18,
+                speed: 0.005
+            };
+        });
+
+        function animate() {
+            ctx.fillStyle = 'rgba(3, 3, 8, 0.25)';
+            ctx.fillRect(0, 0, width, height);
+
+            const centerX = width / 2;
+            const centerY = height / 2 + 30;
+
+            spiralParticles.forEach(p => {
+                p.angle += p.speed;
+                const x = centerX + Math.cos(p.angle) * p.radius;
+                const y = centerY + Math.sin(p.angle) * (p.radius * 0.45);
+
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.alpha;
+                ctx.beginPath();
+                ctx.arc(x, y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ffd700';
+            ctx.fillStyle = '#ffee55';
+
+            heartParticles.forEach(hp => {
+                ctx.globalAlpha = Math.sin(Date.now() * 0.003 + hp.x) * 0.3 + 0.7;
+                ctx.beginPath();
+                ctx.arc(hp.x + (Math.random() - 0.5) * 1.5, hp.y + (Math.random() - 0.5) * 1.5, hp.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.shadowBlur = 0;
+
+            orbitingNodes.forEach(node => {
+                node.angle += node.speed;
+                const x = centerX + Math.cos(node.angle) * node.orbitRadiusX;
+                const y = centerY + Math.sin(node.angle) * node.orbitRadiusY;
+
+                const scale = (Math.sin(node.angle) + 1.8) / 2.8;
+
+                ctx.globalAlpha = Math.max(0.3, scale);
+                ctx.font = `${Math.floor(13 * scale)}px 'Segoe UI', sans-serif`;
+                ctx.fillStyle = '#ffea79';
+                ctx.textAlign = 'center';
+
+                ctx.fillText(`${node.icon} ${node.text}`, x, y);
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        function toggleModal(show) {
+            document.getElementById('modal').classList.toggle('active', show);
+        }
+    </script>
+</body>
+</html>
